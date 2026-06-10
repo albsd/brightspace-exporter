@@ -9,7 +9,7 @@
   <div class="page">
     <h1>Brightspace Exporter</h1>
 
-    <!-- Step 1: start screen -->
+    <!-- Start screen -->
     <div id="pick-screen">
       <p>Files will be saved to your browser's <strong>default Downloads folder</strong>,
          inside the subfolder below
@@ -17,6 +17,12 @@
       <div class="field">
         <label for="export-folder">Export folder (inside Downloads)</label>
         <input type="text" id="export-folder" placeholder="BrightspaceExport">
+      </div>
+      <div class="field">
+        <label>
+          <input type="checkbox" id="zip-download">
+          Download as ZIP archive
+        </label>
       </div>
       <p class="hint">To save outside Downloads entirely, change your browser's default
          download location in its settings, then come back and click Start.</p>
@@ -38,7 +44,7 @@
       <div class="log-block" id="log"></div>
     </div>
 
-    <!-- Step 3: summary -->
+    <!-- Summary -->
     <div id="summary-screen" style="display:none">
       <div class="summary-card">
         <h2>Download complete</h2>
@@ -70,6 +76,7 @@
     </div>
   </div>
 
+  <script src="../lib/jszip.min.js"></script>
   <script src="download.js" type="module"></script>
 </body>
 </html>

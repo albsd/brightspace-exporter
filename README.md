@@ -45,3 +45,18 @@ download/     download tab (progress UI + download logic)
 src/          shared modules (API client, settings store, file naming)
 icons/        extension icons
 ```
+
+## Acknowledgements
+
+This project uses the following open-source software:
+
+- **JSZip** (v3.10.1) — used for ZIP archive creation and extraction.
+  Copyright © 2009–2016 Stuart Knightley.
+  Licensed under the MIT License (or GPLv3).
+  https://github.com/Stuk/jszip
+
+- **Pako** — zlib port used internally by JSZip for compression.
+  Licensed under the MIT License.
+  https://github.com/nodeca/pako
+
+See the `THIRD_PARTY_LICENSES.md` file for license texts and additional details.

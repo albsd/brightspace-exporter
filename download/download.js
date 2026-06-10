@@ -149,13 +149,17 @@ async function withRetry(fn, maxAttempts = 3) {
   }
 }
 
-async function downloadFile({ api, filePath, filename, url, logPath, state, orgUnitId, cat }) {
+async function downloadFile({ api, filePath, filename, url, logPath, state, orgUnitId, cat, zip }) {
   setText(`current-${orgUnitId}`, filename);
   appendLog({ status: 'current', path: logPath });
 
   try {
     const blob = await withRetry(() => api.downloadBlob(url));
-    await chromeDownload(blob, filePath);
+    if (zip) {
+      zip.file(filePath, blob);
+    } else {
+      await chromeDownload(blob, filePath);
+    }
     state.overall.done++;
     state.courses[orgUnitId].categories[cat].done++;
     appendLog({ status: 'done', path: logPath });
@@ -173,7 +177,7 @@ async function downloadFile({ api, filePath, filename, url, logPath, state, orgU
   updateOverall(state);
 }
 
-async function downloadContent(course, courseBasePath, api, state, contentTypes) {
+async function downloadContent(course, courseBasePath, api, state, contentTypes, zip) {
   const toc = await api.getContentTOC(course.orgUnitId);
   const { files, videos } = extractFromTOC(toc.Modules);
   const cat = state.courses[course.orgUnitId].categories;
@@ -197,14 +201,18 @@ async function downloadContent(course, courseBasePath, api, state, contentTypes)
       const filename = sanitizeFilename(rawFilename);
       const logPath = `Content/${file.path.join('/')}/${rawFilename}`;
       const filePath = [courseBasePath, 'Content', ...sanitizedSegments, filename].join('/');
-      await downloadFile({ api, filePath, filename, url: file.url, logPath, state, orgUnitId: course.orgUnitId, cat: 'content' });
+      await downloadFile({ api, filePath, filename, url: file.url, logPath, state, orgUnitId: course.orgUnitId, cat: 'content', zip });
     }
   }
 
   if (wantVideos && videos.length > 0) {
     const html = generateVideoLinksHTML(videos);
     const filePath = [courseBasePath, 'Videos', 'video-links.html'].join('/');
-    await chromeDownload(textToBlob(html), filePath);
+    if (zip) {
+        zip.file(filePath, textToBlob(html));
+    } else {
+        await chromeDownload(textToBlob(html), filePath);
+    }
     state.overall.done++;
     cat.videos.done = 1;
     updateCategoryProgress(course.orgUnitId, 'videos', 1, 1);
@@ -213,7 +221,7 @@ async function downloadContent(course, courseBasePath, api, state, contentTypes)
   }
 }
 
-async function downloadAssignments(course, courseBasePath, api, state) {
+async function downloadAssignments(course, courseBasePath, api, state, zip) {
   const folders = await api.getAssignmentFolders(course.orgUnitId);
   const cat = state.courses[course.orgUnitId].categories;
 
@@ -230,7 +238,12 @@ async function downloadAssignments(course, courseBasePath, api, state) {
     const instructionsHtml = folder.instructions
       ? `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${sanitizeFilename(folder.name)}</title></head><body>${folder.instructions}</body></html>`
       : '<p>No instructions provided.</p>';
-    await chromeDownload(textToBlob(instructionsHtml), `${folderBasePath}/instructions.html`);
+    
+    if (zip) {
+        zip.file(`${folderBasePath}/instructions.html`, textToBlob(instructionsHtml));
+    } else {
+        await chromeDownload(textToBlob(instructionsHtml), `${folderBasePath}/instructions.html`);
+    }
     state.overall.done++;
     cat.assignments.done++;
     updateCategoryProgress(course.orgUnitId, 'assignments', cat.assignments.done, cat.assignments.total);
@@ -241,7 +254,7 @@ async function downloadAssignments(course, courseBasePath, api, state) {
       const url = api.assignmentAttachmentUrl(course.orgUnitId, folder.id, att.fileId);
       const logPath = `Assignments/${folder.name}/${att.fileName}`;
       const filePath = `${folderBasePath}/${sanitizeFilename(att.fileName)}`;
-      await downloadFile({ api, filePath, filename: att.fileName, url, logPath, state, orgUnitId: course.orgUnitId, cat: 'assignments' });
+      await downloadFile({ api, filePath, filename: att.fileName, url, logPath, state, orgUnitId: course.orgUnitId, cat: 'assignments', zip });
     }
   }
 }
@@ -249,6 +262,9 @@ async function downloadAssignments(course, courseBasePath, api, state) {
 async function runDownload(job) {
   const api = new BrightspaceAPI(job.institutionUrl);
   const state = makeState(job);
+  
+  const zipEnabled = document.getElementById('zip-download').checked;
+  const zip = zipEnabled ? new JSZip() : null;
 
   job.courses.forEach(c =>
     buildCourseDom(c.orgUnitId, c.name, job.contentTypes, job.progressDetail)
@@ -259,10 +275,10 @@ async function runDownload(job) {
 
     try {
       if (job.contentTypes.includes('content') || job.contentTypes.includes('videos')) {
-        await downloadContent(course, courseBasePath, api, state, job.contentTypes);
+        await downloadContent(course, courseBasePath, api, state, job.contentTypes, zip);
       }
       if (job.contentTypes.includes('assignments')) {
-        await downloadAssignments(course, courseBasePath, api, state);
+        await downloadAssignments(course, courseBasePath, api, state, zip);
       }
     } catch (err) {
       if (err instanceof APIError && (err.status === 401 || err.status === 403)) {
@@ -272,6 +288,13 @@ async function runDownload(job) {
       appendLog({ status: 'fail', path: `[${course.name}] unexpected error: ${err.message}` });
       state.failed.push(`[${course.name}] ${err.message}`);
     }
+  }
+
+  if (zip) {
+    appendLog({ status: 'current', path: 'Generating ZIP file...' });
+    const content = await zip.generateAsync({ type: 'blob' });
+    await chromeDownload(content, `${job.exportFolderName}.zip`);
+    appendLog({ status: 'done', path: 'ZIP file generated.' });
   }
 
   showSummary(state);
