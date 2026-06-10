@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Brightspace Exporter — Downloading</title>
+  <link rel="stylesheet" href="download.css">
+</head>
+<body>
+  <div class="page">
+    <h1>Brightspace Exporter</h1>
+
+    <!-- Step 1: start screen -->
+    <div id="pick-screen">
+      <p>Files will be saved to your browser's <strong>default Downloads folder</strong>,
+         inside the subfolder below
+         (e.g. <code>Downloads/BrightspaceExport/&lt;Course Name&gt;/...</code>).</p>
+      <div class="field">
+        <label for="export-folder">Export folder (inside Downloads)</label>
+        <input type="text" id="export-folder" placeholder="BrightspaceExport">
+      </div>
+      <p class="hint">To save outside Downloads entirely, change your browser's default
+         download location in its settings, then come back and click Start.</p>
+      <button class="btn-primary" id="start-btn">Start Download</button>
+    </div>
+
+    <!-- Step 2: active download progress -->
+    <div id="progress-screen" style="display:none">
+      <div id="course-blocks"></div>
+
+      <div class="overall-block">
+        <div class="overall-row">
+          <span id="overall-label">Overall: 0 / 0 files</span>
+          <span class="eta" id="eta-label"></span>
+        </div>
+        <div class="bar-wrap"><div class="bar overall" id="overall-bar"></div></div>
+      </div>
+
+      <div class="log-block" id="log"></div>
+    </div>
+
+    <!-- Step 3: summary -->
+    <div id="summary-screen" style="display:none">
+      <div class="summary-card">
+        <h2>Download complete</h2>
+        <div class="stat-row">
+          <div class="stat">
+            <div class="stat-num green" id="stat-done">0</div>
+            <div class="stat-label">Downloaded</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num yellow" id="stat-skip">0</div>
+            <div class="stat-label">Skipped</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num red" id="stat-fail">0</div>
+            <div class="stat-label">Failed</div>
+          </div>
+        </div>
+        <div id="failed-section" style="display:none">
+          <p style="font-size:13px;margin-bottom:8px;font-weight:500">Failed files:</p>
+          <pre class="failed-list" id="failed-list"></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error (e.g. not logged in, no job) -->
+    <div id="error-screen" style="display:none">
+      <p id="error-message">Something went wrong.</p>
+      <a id="error-link" href="#" target="_blank">Open Brightspace to re-login</a>
+    </div>
+  </div>
+
+  <script src="download.js" type="module"></script>
+</body>
+</html>

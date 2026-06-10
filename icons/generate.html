@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<body>
+<p>Open this file in Chrome. Three icon PNGs will download automatically. Save them into the <code>icons/</code> folder.</p>
+<script>
+[16, 48, 128].forEach(size => {
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#1a73e8';
+  ctx.fillRect(0, 0, size, size);
+  ctx.fillStyle = 'white';
+  ctx.font = `bold ${Math.floor(size * 0.55)}px sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('B', size / 2, size / 2);
+  const a = document.createElement('a');
+  a.download = `icon-${size}.png`;
+  a.href = c.toDataURL();
+  document.body.appendChild(a);
+  a.click();
+});
+</script>
+</body>
+</html>

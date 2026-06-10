@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Brightspace Exporter — Settings</title>
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Settings</h1>
+
+    <div class="field">
+      <label for="institutionUrl">Brightspace URL</label>
+      <input type="text" id="institutionUrl" placeholder="e.g. brightspace.example.com">
+      <p class="description">The hostname of your institution's Brightspace instance (without https://).</p>
+    </div>
+
+    <div class="field">
+      <label for="progressDetail">Progress detail</label>
+      <select id="progressDetail">
+        <option value="per-category">Per category (Content, Assignments, Videos)</option>
+        <option value="overall">Overall file count only</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Default content types</label>
+      <div class="checkbox-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="type-content" value="content"> Course Content
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="type-assignments" value="assignments"> Assignments
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="type-videos" value="videos"> Videos (links)
+        </label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="exportFolderName">Export folder</label>
+      <input type="text" id="exportFolderName" placeholder="e.g. BrightspaceExport">
+      <p class="description">Subfolder path created inside your browser's default Downloads
+        folder, e.g. <code>BrightspaceExport</code> or <code>School/2026</code>.
+        Browser extensions cannot save outside the Downloads folder.</p>
+    </div>
+
+    <button class="btn" id="save-btn">Save</button>
+    <p class="status" id="status"></p>
+  </div>
+  <script src="settings.js" type="module"></script>
+</body>
+</html>

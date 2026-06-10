@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Brightspace Exporter</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="header">
+    <h1>Brightspace Exporter</h1>
+    <a id="settings-link" href="#">Settings</a>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Course</div>
+    <div id="detected-course" class="detected-course none">Not on a course page</div>
+    <p id="course-error" class="error" style="display:none"></p>
+    <button class="expand-btn" id="expand-btn">Add more courses</button>
+    <div class="course-list" id="course-list">
+      <p class="loading" id="courses-loading">Loading...</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Download</div>
+    <div class="checkbox-group" id="content-types">
+      <label class="checkbox-label">
+        <input type="checkbox" value="content" id="type-content"> Course Content
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" value="assignments" id="type-assignments"> Assignments
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" value="videos" id="type-videos"> Videos (links file)
+      </label>
+    </div>
+  </div>
+
+  <div class="footer">
+    <button class="btn" id="download-btn" disabled>Download</button>
+  </div>
+
+  <script src="popup.js" type="module"></script>
+</body>
+</html>
