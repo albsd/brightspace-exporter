@@ -3,6 +3,7 @@
   "name": "Brightspace Exporter",
   "version": "0.1.0",
   "description": "Download course materials from your Brightspace instance into a structured local folder.",
+  "author": "Albsd",
   "permissions": ["storage", "tabs", "scripting", "activeTab", "downloads"],
   "host_permissions": ["https://*/*"],
   "action": {
